@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import FormularioDeTarefa from './components/FormularioDeTarefa';
@@ -11,7 +11,31 @@ function App() {
 
   const [tarefas, setTarefas] = useState([]);
 
-  const adicionarTarefa = (texto) => {
+  useEffect(
+    () =>{
+      const fetchTarefas = async () => {
+        try {
+          const response = await fetch('http://localhost:3000/tarefas');
+          if (!response.ok) {
+            throw new Error('Erro ao carregar as tarefas da API.');
+          }
+          const data = await response.jsaon();
+          const tarefasFormatadas = data.map(t => ({
+            id: t.id,
+            texto: t.texto,
+            concluida: t.concluida
+          }));
+          setTarefas(tarefasFormatadas);
+        }catch (error) {
+          console.error("Falha ao buscar tarefas", error);
+        }
+      };
+      fetchTarefas();
+
+    }, []
+  )
+
+ /* const adicionarTarefa = (texto) => {
     const novaTarefa = {
       id: Date.now(),
       texto,
@@ -43,7 +67,7 @@ function App() {
         </Routes>
       </div>
     </Router>
-  );
+  );*/
 }
 
 export default App;
